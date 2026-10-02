@@ -1,0 +1,79 @@
+# portal-affordable v0.1.0
+# Every model below is a Nous Portal slug. Prices change; check
+# https://portal.nousresearch.com/models before trusting any number in README.md.
+#
+# Why this file exists: auxiliary.<task>.provider "auto" routes every side task
+# to your MAIN model. Pinning them here means you can /model up to an expensive
+# model for a hard turn and vision, compression and titles stay cheap.
+
+model:
+  provider: nous
+  default: deepseek/deepseek-v4-flash-0731   # cheap, no promo price to expire; /model up for hard turns
+
+display:
+  show_cost: true                            # $ in the status bar, so spend is visible
+
+auxiliary:
+  # Image analysis (vision_analyze + browser screenshots). An explicit vision
+  # backend also makes images go through this describer even when the main
+  # model claims native vision (agent.image_input_mode: auto).
+  vision:
+    provider: nous
+    model: inclusionai/ling-3.0-flash-vl
+    fallback_chain:
+      - provider: nous
+        model: google/gemma-4-26b-a4b-it
+      - provider: nous
+        model: openai/gpt-4.1-nano
+
+  # Context compression is the session's memory of itself: keep a model that
+  # held every fact in testing, not the cheapest one.
+  compression:
+    provider: nous
+    model: deepseek/deepseek-v4-flash-0731
+    reasoning_effort: low
+    fallback_chain:
+      - provider: nous
+        model: openai/gpt-5-nano
+
+  # Dangerous-command classifier (approvals.mode: smart).
+  approval:
+    provider: nous
+    model: openai/gpt-5-nano
+    reasoning_effort: low
+    fallback_chain:
+      - provider: nous
+        model: deepseek/deepseek-v4-flash-0731
+
+  title_generation:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+
+  skills_hub:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+  mcp:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+  profile_describer:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+  triage_specifier:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+  monitor:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+  tts_audio_tags:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+  memory_query_rewrite:
+    provider: nous
+    model: inclusionai/ling-3.0-flash
+
+  # Left on "auto" (= main model) on purpose:
+  #   background_review - writes your memory and skills; on auto it replays the
+  #                       conversation on a warm cache. Route it only if your
+  #                       main model is expensive AND you accept a weaker writer.
+  #   curator           - consolidates skills; same reasoning.
+  #   kanban_decomposer, goal_judge - planning calls where quality pays for itself.

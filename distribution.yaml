@@ -1,0 +1,10 @@
+name: portal-affordable
+version: 0.1.0
+description: "Nous Portal profile tuned for low spend: a low-cost main model, with vision, compression, titles and approvals pinned to low-cost models that keep their price when you switch the main model."
+hermes_requires: ">=0.21.0"
+author: "witcheer"
+license: "MIT"
+distribution_owned:
+  - config.yaml
+  - README.md
+  - LICENSE
